@@ -1,11 +1,82 @@
 // ==UserScript==
-// @name         Pos general fixes
+// @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      0.1
-// @description  pos reply font fix
+// @version      0.3
+// @description  sa forums shit
 // @author       You
 // @match        forums.somethingawful.com/*
 // ==/UserScript==
+
+//--------------------- functions ---------------------------------
+
+//copied from snackoverflow because I coudln't understand twitter's version
+//http://stackoverflow.com/questions/950087/include-a-javascript-file-in-another-javascript-file
+function loadScript(url, callback, id)
+{
+    // Adding the script tag to the head as suggested before
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = url;
+    script.id = id;
+
+    // Then bind the event to the callback function.
+    // There are several events for cross browser compatibility.
+    script.onreadystatechange = callback;
+    script.onload = callback;
+
+    // Fire the loading
+    head.appendChild(script);
+}
+
+
+//----------------- shite ----------------------------
+
+//if i was bothered i'd sort out all the lonks in one loop and hand them out to these funcs 
+
+
+//twitter integration
+var twitLoaded = function() {
+ 	var links = document.getElementsByTagName("a");
+	//find all tweet links
+	for (var i=1; i < links.length; i++) {
+        var ref = links[i].href;
+        //console.log(ref);
+        if(ref.indexOf("twitter.com") > -1 && ref.indexOf("status/") > -1){
+            //get tweet id
+            var id = ref.substring(ref.indexOf("status/") + 7);
+            //fuck it, just slam in the link
+            twttr.widgets.createTweet(id, links[i]);
+        }
+	}
+};
+
+loadScript("http://platform.twitter.com/widgets.js", twitLoaded, "twitscript");
+
+//vine integration
+var links = document.getElementsByTagName("a");
+//find all vine links
+var haveVine = false;
+for (var i=1; i < links.length; i++) {
+    if(links[i].href.indexOf("vine.co") > -1){
+        haveVine = true;
+        var vineFrame = document.createElement("iframe");
+        vineFrame.class = "vine-embed";
+        vineFrame.src = links[i].href + "/embed/postcard";
+        vineFrame.width="320";
+        vineFrame.height="400";
+        vineFrame.frameborder="0"   
+        links[i].appendChild(document.createElement("br"));
+        links[i].appendChild(vineFrame);
+    }
+}
+if (haveVine){
+    loadScript("//platform.vine.co/static/scripts/embed.js");
+}
+
+
+
+// ------------------ POS only garbage ---------------------------------
 if (document.body.className.indexOf("forum_219") > -1)
 {
     //console.log("i ran");
@@ -15,7 +86,7 @@ if (document.body.className.indexOf("forum_219") > -1)
     }
     GM_addStyle ("\
                  #thread dl.userinfo dt.platinum{\
-    			 	background-image: url(data:image/png;base64,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);\
+    			 	background-image: url(data:image/png;base64,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);\
 				 }");
     //console.log("i ran");
     if(window.location.pathname == "/forumdisplay.php"){
@@ -40,5 +111,6 @@ if (document.body.className.indexOf("forum_219") > -1)
             }
         }
     }
+    //cosby shit - NICE! overhaul
 }
              
