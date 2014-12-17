@@ -4,7 +4,8 @@
 // @version      0.4
 // @description  sa forums shit
 // @author       You
-// @match        forums.somethingawful.com/*
+// @match        http://forums.somethingawful.com/*
+// @match        https://forums.somethingawful.com/*
 // ==/UserScript==
 
 //--------------------- functions ---------------------------------
