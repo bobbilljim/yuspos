@@ -38,7 +38,7 @@ function loadScript(url, callback, id)
 
 //twitter integration
 var twitLoaded = function() {
- 	var links = document.getElementsByTagName("a");
+ 	var links = jQuery('.postbody > a'); //more efficient AND wont load tweets into title text haha
 	//find all tweet links
 	for (var i=1; i < links.length; i++) {
         var ref = links[i].href;
@@ -55,7 +55,7 @@ var twitLoaded = function() {
 loadScript("http://platform.twitter.com/widgets.js", twitLoaded, "twitscript");
 
 //vine integration
-var links = document.getElementsByTagName("a");
+var links = jQuery('.postbody > a');
 //find all vine links
 var haveVine = false;
 for (var i=1; i < links.length; i++) {
@@ -75,6 +75,17 @@ if (haveVine){
     loadScript("//platform.vine.co/static/scripts/embed.js");
 }
 
+//some functionality
+//jQuery('.userinfo.userid-43235').parent().attr('style', "background-color: purple !important;background-image:none !important;");
+//if (jQuery('.userinfo.userid-185872').size() > 0) { 
+//	var warn = confirm('Warning! ' + jQuery('.userinfo.userid-185872 .author').first().html() + ' Post Detected. Proceed?'); 
+//	if(warn == false){ window.location.href = 'http://forums.somethingawful.com/forumdisplay.php?forumid=219' };
+//};
+
+//resize images like the forums damn well should - TODO: auto timg style but as wide as screen??
+jQuery('.postbody img.img').each(function(){
+	jQuery(this).attr('style',"max-width:100%");
+});
 
 
 // ------------------ POS only garbage ---------------------------------
