@@ -55,10 +55,10 @@ var twitLoaded = function() {
 loadScript("http://platform.twitter.com/widgets.js", twitLoaded, "twitscript");
 
 //vine integration
-var links = jQuery('.postbody > a');
+var links = jQuery('.postbody > a , blockquote > a');
 //find all vine links
 var haveVine = false;
-for (var i=1; i < links.length; i++) {
+for (var i=0; i < links.length; i++) {
     if(links[i].href.indexOf("vine.co") > -1){
         haveVine = true;
         var vineFrame = document.createElement("iframe");
