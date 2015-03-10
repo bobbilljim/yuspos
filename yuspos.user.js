@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      0.4
+// @version      0.5
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -81,6 +81,11 @@ if (haveVine){
 //	var warn = confirm('Warning! ' + jQuery('.userinfo.userid-185872 .author').first().html() + ' Post Detected. Proceed?'); 
 //	if(warn == false){ window.location.href = 'http://forums.somethingawful.com/forumdisplay.php?forumid=219' };
 //};
+
+if (jQuery('.userinfo.userid-185872').size() > 0) { 
+	loadScript('http://code.onion.com/fartscroll.js');
+	fartscroll(500);
+}
 
 //resize images like the forums damn well should - TODO: auto timg style but as wide as screen??
 jQuery('.postbody img.img').each(function(){
