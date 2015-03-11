@@ -75,6 +75,24 @@ if (haveVine){
     loadScript("//platform.vine.co/static/scripts/embed.js");
 }
 
+//video support (webms, gifvs..)
+var webmLinks = jQuery('.postbody > a , blockquote > a');
+//find all webm links
+for (var i=0; i < webmLinks.length; i++) {
+    if(webmLinks[i].href.indexOf(".webm") > -1 || webmLinks[i].href.indexOf(".gifv") > -1){
+        haveWebm = true
+        var mungedLink = webmLinks[i].href.replace(".gifv", ".webm");
+        var vidFrame = document.createElement("video");
+        vidFrame.setAttribute("muted", '');
+        vidFrame.setAttribute("autoplay", '');
+        vidFrame.setAttribute("loop", '');
+        vidFrame.setAttribute("src", mungedLink);
+        
+        $(webmLinks[i]).replaceWith(vidFrame);
+    }
+}
+
+
 //some functionality
 //jQuery('.userinfo.userid-43235').parent().attr('style', "background-color: purple !important;background-image:none !important;");
 //if (jQuery('.userinfo.userid-185872').size() > 0) { 
