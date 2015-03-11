@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      0.5
+// @version      0.6
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
