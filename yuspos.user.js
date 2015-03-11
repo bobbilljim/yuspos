@@ -83,8 +83,8 @@ if (haveVine){
 //};
 
 if (jQuery('.userinfo.userid-185872').size() > 0) { 
-	loadScript('http://code.onion.com/fartscroll.js');
-	fartscroll(500);
+    loadScript("http://code.onion.com/fartscroll.js", function () { fartscroll(500); console.log("fartscroll activated");} );
+    console.log("fartscroll set");
 }
 
 //resize images like the forums damn well should - TODO: auto timg style but as wide as screen??
