@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      0.7
+// @version      0.8
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -172,6 +172,14 @@ if (document.body.className.indexOf("forum_219") > -1)
                     repliesCells[i].innerHTML = "<a href=\"http://forums.somethingawful.com/newreply.php?s=&action=newreply&threadid=" + threadNumber + "\">" + numReplies + "</a>" + str.substring(str.indexOf("</a>") + 4);
                 }
             }
+        }
+    }
+    //CHECK THAT SIGBOX brute force approach
+    var s = document.getElementsByName('signature');
+    for(var si=0; si<s.length; si++)
+    {
+        if(s[si].getAttribute('type') == 'checkbox'){
+            s[si].setAttribute('checked',true);
         }
     }
 }
