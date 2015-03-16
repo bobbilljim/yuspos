@@ -155,11 +155,13 @@ if (jQuery('.userinfo.userid-185872').size() > 0) {
     console.log("fartscroll set");
 }
 
-//resize images like the forums damn well should - TODO: auto timg style but as wide as screen??
-//firefox is a garbage and doesnt understand max-width:100% inside tables
-var max_width = Math.min.apply(Math, jQuery('.postbody').not(jQuery('.postbody > img').parent()).map(function(){ return jQuery(this).width(); }).get());
-jQuery('.postbody img.img').css("max-width",max_width);
-
+//I think sometimes this shits itself so im doing teh timeout thing
+window.setTimeout(function() {
+	//resize images like the forums damn well should - TODO: auto timg style but as wide as screen??
+	//firefox is a garbage and doesnt understand max-width:100% inside tables
+	var max_width = Math.min.apply(Math, jQuery('.postbody').not(jQuery('.postbody > img').parent()).map(function(){ return jQuery(this).width(); }).get());
+	jQuery('.postbody img.img').css("max-width",max_width);
+}, 200);
 console.log("farking hell");
 // ------------------ POS only garbage ---------------------------------
 if (document.body.className.indexOf("forum_219") > -1)
