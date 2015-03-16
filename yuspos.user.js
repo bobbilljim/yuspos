@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.0
+// @version      1.01
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -160,7 +160,9 @@ window.setTimeout(function() {
 	//resize images like the forums damn well should - TODO: auto timg style but as wide as screen??
 	//firefox is a garbage and doesnt understand max-width:100% inside tables
 	var max_width = Math.min.apply(Math, jQuery('.postbody').not(jQuery('.postbody > img').parent()).map(function(){ return jQuery(this).width(); }).get());
-	jQuery('.postbody img.img').css("max-width",max_width);
+	if(max_width > 0){
+		jQuery('.postbody img.img').css("max-width",max_width);
+	}
 }, 200);
 console.log("farking hell");
 // ------------------ POS only garbage ---------------------------------
