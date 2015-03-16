@@ -150,10 +150,10 @@ if(haveTweet){
 //	if(warn == false){ window.location.href = 'http://forums.somethingawful.com/forumdisplay.php?forumid=219' };
 //};
 
-if (jQuery('.userinfo.userid-185872').size() > 0) { 
-    loadScript("http://code.onion.com/fartscroll.js", function () { fartscroll(500); console.log("fartscroll activated");} );
-    console.log("fartscroll set");
-}
+//if (jQuery('.userinfo.userid-185872').size() > 0) { 
+//    loadScript("http://code.onion.com/fartscroll.js", function () { fartscroll(500); console.log("fartscroll activated");} );
+//    console.log("fartscroll set");
+//}
 
 //resize images like the forums damn well should - TODO: auto timg style but as wide as screen??
 //firefox is a garbage and doesnt understand max-width:100% inside tables
