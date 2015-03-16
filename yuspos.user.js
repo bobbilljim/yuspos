@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      0.9
+// @version      1.0
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -52,10 +52,12 @@ function twitLoaded (){
             //get tweet id
             var id = ref.substring(ref.lastIndexOf("/") + 1);
             //fuck it, just slam in the link
-            twttr.widgets.createTweet(id, links[i]);
+            var myDiv = document.createElement('div');
+            $(links[i]).replaceWith(myDiv);
+            twttr.widgets.createTweet(id, myDiv);
         }
 	}
-};
+}
 
 //----------------- shite ----------------------------
 
@@ -66,6 +68,8 @@ var haveTweet = false;
 //cheesy embed loop go
 var tindeck = 'tindeck.com/listen/';
 var gfycat = 'gfycat.com/';
+var soundcloud = 'soundcloud.com/';
+var soundclouds = {};
 var cheesy = jQuery('.postbody > a , blockquote > a');
 for (var c=0; c < cheesy.length; c++) {
     var cheesyRef = cheesy[c].href;
@@ -73,9 +77,8 @@ for (var c=0; c < cheesy.length; c++) {
         console.log("got tindeck, url: " + cheesyRef);
         var tinDiv = document.createElement("div");
         var part1 = "<object width=\"466\" height=\"105\">\n<param name=\"movie\" value=\"http://tindeck.com/player/v1/player.swf?trackid=";
-        var part2 = "\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><param name=\"wmode\" value=\"transparent\"></param>"
-                        + "<embed src=\"http://tindeck.com/player/v1/player.swf?trackid=";
-        var part3 = "\" type=\"application/x-shockwave-flash\" wmode=\"transparent\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"466\" height=\"105\"></embed></object>"
+        var part2 = "\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><param name=\"wmode\" value=\"transparent\"></param><embed src=\"http://tindeck.com/player/v1/player.swf?trackid=";
+        var part3 = "\" type=\"application/x-shockwave-flash\" wmode=\"transparent\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"466\" height=\"105\"></embed></object>";
         var trackIdSegment = cheesyRef.substring(cheesyRef.indexOf(tindeck) + tindeck.length);
         var trackId = trackIdSegment.substring(0, trackIdSegment.indexOf('/') > 0 ? trackIdSegment.indexOf('/') : trackIdSegment.length); //defensive lol whyyy
         tinDiv.innerHTML = part1 + trackId + part2 + trackId + part3;
@@ -87,7 +90,7 @@ for (var c=0; c < cheesy.length; c++) {
         $(cheesy[c]).replaceWith("<img class=\"gfyitem\" data-id=\"" + source + "\" />");      
         haveGfycats = true;
     }else if (cheesyRef.indexOf(".webm") > -1 || cheesyRef.indexOf(".gifv") > -1){
-        haveWebm = true
+        haveWebm = true;
         var mungedLink = webmLinks[i].href.replace(".gifv", ".webm");
         var vidFrame = embedWebm(mungedLink);
         $(cheesy[c]).replaceWith(vidFrame);
@@ -99,10 +102,35 @@ for (var c=0; c < cheesy.length; c++) {
         vineFrame.width="320";
         vineFrame.height="400";
         vineFrame.frameborder="0";
-        cheesy[c].appendChild(document.createElement("br"));
-        cheesy[c].appendChild(vineFrame);
+        $(cheesy[c]).replaceWith(vineFrame);
     }else if(cheesyRef.indexOf("twitter.com") > -1 && cheesyRef.indexOf("status") > -1){
         haveTweet = true;
+    }else if (cheesyRef.indexOf(soundcloud) > -1){
+        if(soundclouds[cheesyRef]){
+            console.log("duped");
+        }
+        if(!soundclouds[cheesyRef]){
+            console.log("adding soudclown link: " + cheesyRef);
+            soundclouds[cheesyRef] = true;
+            var request = 'http://api.soundcloud.com/resolve.json?url=' + cheesyRef + '&client_id=e9e08f5d3e6c544a4d1add6c762e9e2d';
+            console.log(request);
+            $.get(request , function (result) {
+                //console.log(result);
+                if(result.kind === "track"){
+                    console.log("got track: " + result.permalink_url + " id " + result.id);
+                    var soundSrc = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/" + result.id + "&amp;color=57ff57&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false";
+                    var soundFrame = document.createElement('iframe');
+                    soundFrame.width="100%";
+                    soundFrame.height="166";
+                    soundFrame.scrolling="no";
+                    soundFrame.frameborder="no";
+                    soundFrame.src = soundSrc;
+                    $("[href$='" + result.permalink_url.substring(result.permalink_url.indexOf(soundcloud)) + "']").replaceWith(soundFrame);
+                }
+                //can't do much to embed users and stuff so w/e
+            });
+        }
+        //http://api.soundcloud.com/resolve.json?url=https://soundcloud.com/giraffage/04-all-that-matters&client_id=e9e08f5d3e6c544a4d1add6c762e9e2d
     }
 }
 if(haveGfycats){
