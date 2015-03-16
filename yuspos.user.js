@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      0.8
+// @version      0.9
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -30,14 +30,19 @@ function loadScript(url, callback, id)
     head.appendChild(script);
 }
 
-
-//----------------- shite ----------------------------
-
-//if i was bothered i'd sort out all the lonks in one loop and hand them out to these funcs 
-
+//give me a webm url
+function embedWebm(url){
+    var vidFrame = document.createElement("video");
+    vidFrame.setAttribute("muted", '');
+    vidFrame.setAttribute("autoplay", '');
+    vidFrame.setAttribute("loop", '');
+    vidFrame.setAttribute("src", url);
+    return vidFrame;
+}
 
 //twitter integration
-var twitLoaded = function() {
+function twitLoaded (){
+    //this goes over all teh links again for a MASSIVE performance hit :(
  	var links = jQuery('.postbody > a'); //more efficient AND wont load tweets into title text haha
 	//find all tweet links
 	for (var i=1; i < links.length; i++) {
@@ -52,46 +57,63 @@ var twitLoaded = function() {
 	}
 };
 
-loadScript("http://platform.twitter.com/widgets.js", twitLoaded, "twitscript");
+//----------------- shite ----------------------------
 
-//vine integration
-var links = jQuery('.postbody > a , blockquote > a');
-//find all vine links
+//these are probably redundant
 var haveVine = false;
-for (var i=0; i < links.length; i++) {
-    if(links[i].href.indexOf("vine.co") > -1){
+var haveGfycats = false;
+var haveTweet = false;
+//cheesy embed loop go
+var tindeck = 'tindeck.com/listen/';
+var gfycat = 'gfycat.com/';
+var cheesy = jQuery('.postbody > a , blockquote > a');
+for (var c=0; c < cheesy.length; c++) {
+    var cheesyRef = cheesy[c].href;
+    if (cheesyRef.indexOf(tindeck) > -1){
+        console.log("got tindeck, url: " + cheesyRef);
+        var tinDiv = document.createElement("div");
+        var part1 = "<object width=\"466\" height=\"105\">\n<param name=\"movie\" value=\"http://tindeck.com/player/v1/player.swf?trackid=";
+        var part2 = "\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><param name=\"wmode\" value=\"transparent\"></param>"
+                        + "<embed src=\"http://tindeck.com/player/v1/player.swf?trackid=";
+        var part3 = "\" type=\"application/x-shockwave-flash\" wmode=\"transparent\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"466\" height=\"105\"></embed></object>"
+        var trackIdSegment = cheesyRef.substring(cheesyRef.indexOf(tindeck) + tindeck.length);
+        var trackId = trackIdSegment.substring(0, trackIdSegment.indexOf('/') > 0 ? trackIdSegment.indexOf('/') : trackIdSegment.length); //defensive lol whyyy
+        tinDiv.innerHTML = part1 + trackId + part2 + trackId + part3;
+        $(cheesy[c]).replaceWith(tinDiv);
+    }else if (cheesyRef.indexOf(gfycat) > -1){
+        console.log("got gfycat url: " + cheesyRef);
+        var source = cheesyRef.substring(cheesyRef.lastIndexOf("/") + 1, (cheesyRef.substring(cheesyRef.lastIndexOf("/")).lastIndexOf(".") > -1 ? cheesyRef.lastIndexOf(".") : cheesyRef.length));
+        console.log("sauce = " + source);
+        $(cheesy[c]).replaceWith("<img class=\"gfyitem\" data-id=\"" + source + "\" />");      
+        haveGfycats = true;
+    }else if (cheesyRef.indexOf(".webm") > -1 || cheesyRef.indexOf(".gifv") > -1){
+        haveWebm = true
+        var mungedLink = webmLinks[i].href.replace(".gifv", ".webm");
+        var vidFrame = embedWebm(mungedLink);
+        $(cheesy[c]).replaceWith(vidFrame);
+    }else if(cheesyRef.indexOf("vine.co") > -1){
         haveVine = true;
         var vineFrame = document.createElement("iframe");
         vineFrame.class = "vine-embed";
-        vineFrame.src = links[i].href + "/embed/postcard";
+        vineFrame.src = cheesyRef + "/embed/postcard";
         vineFrame.width="320";
         vineFrame.height="400";
         vineFrame.frameborder="0";
-        links[i].appendChild(document.createElement("br"));
-        links[i].appendChild(vineFrame);
+        cheesy[c].appendChild(document.createElement("br"));
+        cheesy[c].appendChild(vineFrame);
+    }else if(cheesyRef.indexOf("twitter.com") > -1 && cheesyRef.indexOf("status") > -1){
+        haveTweet = true;
     }
+}
+if(haveGfycats){
+    loadScript('http://assets.gfycat.com/js/gfyajax-0.517d.js');
 }
 if (haveVine){
     loadScript("//platform.vine.co/static/scripts/embed.js");
 }
-
-//video support (webms, gifvs..)
-var webmLinks = jQuery('.postbody > a , blockquote > a');
-//find all webm links
-for (var i=0; i < webmLinks.length; i++) {
-    if(webmLinks[i].href.indexOf(".webm") > -1 || webmLinks[i].href.indexOf(".gifv") > -1){
-        haveWebm = true
-        var mungedLink = webmLinks[i].href.replace(".gifv", ".webm");
-        var vidFrame = document.createElement("video");
-        vidFrame.setAttribute("muted", '');
-        vidFrame.setAttribute("autoplay", '');
-        vidFrame.setAttribute("loop", '');
-        vidFrame.setAttribute("src", mungedLink);
-        
-        $(webmLinks[i]).replaceWith(vidFrame);
-    }
+if(haveTweet){
+    loadScript("http://platform.twitter.com/widgets.js", twitLoaded, "twitscript");
 }
-
 
 //some functionality
 //jQuery('.userinfo.userid-43235').parent().attr('style', "background-color: purple !important;background-image:none !important;");
