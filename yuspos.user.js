@@ -73,8 +73,6 @@ var haveTweet = false;
 //cheesy embed loop go
 var tindeck = 'tindeck.com/listen/';
 var gfycat = 'gfycat.com/';
-var soundcloud = 'soundcloud.com/';
-var soundclouds = {};
 var cheesy = jQuery('.postbody > a , blockquote > a');
 for (var c=0; c < cheesy.length; c++) {
     var cheesyRef = cheesy[c].href;
@@ -110,32 +108,6 @@ for (var c=0; c < cheesy.length; c++) {
         $(cheesy[c]).replaceWith(vineFrame);
     }else if(cheesyRef.indexOf("twitter.com") > -1 && cheesyRef.indexOf("status") > -1){
         haveTweet = true;
-    }else if (cheesyRef.indexOf(soundcloud) > -1){
-        if(soundclouds[cheesyRef]){
-            console.log("duped");
-        }
-        if(!soundclouds[cheesyRef]){
-            console.log("adding soudclown link: " + cheesyRef);
-            soundclouds[cheesyRef] = true;
-            var request = 'http://api.soundcloud.com/resolve.json?url=' + cheesyRef + '&client_id=e9e08f5d3e6c544a4d1add6c762e9e2d';
-            console.log(request);
-            $.get(request , function (result) {
-                //console.log(result);
-                if(result.kind === "track"){
-                    console.log("got track: " + result.permalink_url + " id " + result.id);
-                    var soundSrc = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/" + result.id + "&amp;color=57ff57&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false";
-                    var soundFrame = document.createElement('iframe');
-                    soundFrame.width="100%";
-                    soundFrame.height="166";
-                    soundFrame.scrolling="no";
-                    soundFrame.frameborder="no";
-                    soundFrame.src = soundSrc;
-                    $("[href$='" + result.permalink_url.substring(result.permalink_url.indexOf(soundcloud)) + "']").replaceWith(soundFrame);
-                }
-                //can't do much to embed users and stuff so w/e
-            });
-        }
-        //http://api.soundcloud.com/resolve.json?url=https://soundcloud.com/giraffage/04-all-that-matters&client_id=e9e08f5d3e6c544a4d1add6c762e9e2d
     }
 }
 if(haveGfycats){
