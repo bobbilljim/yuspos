@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.01
+// @version      1.02
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -33,10 +33,15 @@ function loadScript(url, callback, id)
 //give me a webm url
 function embedWebm(url){
     var vidFrame = document.createElement("video");
+    var src1 = document.createElement('source');
+    src1.setAttribute("src", url);
+    var src2 = document.createElement('source');
+    src2.setAttribute("src", url.replace(".webm", ".mp4"));
     vidFrame.setAttribute("muted", '');
     vidFrame.setAttribute("autoplay", '');
     vidFrame.setAttribute("loop", '');
-    vidFrame.setAttribute("src", url);
+    vidFrame.appendChild(src1);
+    vidFrame.appendChild(src2);
     return vidFrame;
 }
 
@@ -91,7 +96,7 @@ for (var c=0; c < cheesy.length; c++) {
         haveGfycats = true;
     }else if (cheesyRef.indexOf(".webm") > -1 || cheesyRef.indexOf(".gifv") > -1){
         haveWebm = true;
-        var mungedLink = webmLinks[i].href.replace(".gifv", ".webm");
+        var mungedLink = cheesyRef.replace(".gifv", ".webm");
         var vidFrame = embedWebm(mungedLink);
         $(cheesy[c]).replaceWith(vidFrame);
     }else if(cheesyRef.indexOf("vine.co") > -1){
