@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.03
+// @version      1.04
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -50,7 +50,7 @@ function twitLoaded (){
     //this goes over all teh links again for a MASSIVE performance hit :(
  	var links = jQuery('.postbody > a'); //more efficient AND wont load tweets into title text haha
 	//find all tweet links
-	for (var i=1; i < links.length; i++) {
+	for (var i=0; i < links.length; i++) {
         var ref = links[i].href;
         //console.log(ref);
         if(ref.indexOf("twitter.com") > -1 && ref.indexOf("status") > -1){
