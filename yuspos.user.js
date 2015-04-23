@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.04
+// @version      1.05
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -99,6 +99,10 @@ for (var c=0; c < cheesy.length; c++) {
         var mungedLink = cheesyRef.replace(".gifv", ".webm");
         var vidFrame = embedWebm(mungedLink);
         $(cheesy[c]).replaceWith(vidFrame);
+    }else if (cheesyRef.indexOf("webmup.com") > -1){
+        var mungedLink = cheesyRef + "/vid.webm";
+        var vidFrame = embedWebm(mungedLink);
+        $(cheesy[c]).append("<br />").append(vidFrame);
     }else if(cheesyRef.indexOf("vine.co") > -1){
         haveVine = true;
         var vineFrame = document.createElement("iframe");
@@ -155,10 +159,10 @@ if(haveTweet){
 //	if(warn == false){ window.location.href = 'http://forums.somethingawful.com/forumdisplay.php?forumid=219' };
 //};
 
-if (jQuery('.userinfo.userid-185872').size() > 0) { 
-    loadScript("http://code.onion.com/fartscroll.js", function () { fartscroll(500); console.log("fartscroll activated");} );
-    console.log("fartscroll set");
-}
+//if (jQuery('.userinfo.userid-185872').size() > 0) { 
+//    loadScript("http://code.onion.com/fartscroll.js", function () { fartscroll(500); console.log("fartscroll activated");} );
+//    console.log("fartscroll set");
+//}
 
 //I think sometimes this shits itself so im doing teh timeout thing
 window.setTimeout(function() {
