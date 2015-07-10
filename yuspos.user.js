@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.04
+// @version      1.06
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -71,6 +71,7 @@ var haveVine = false;
 var haveGfycats = false;
 var haveTweet = false;
 //cheesy embed loop go
+//I shoudl really parse urls here and get teh host butt fuck it add some slashes
 var tindeck = 'tindeck.com/listen/';
 var gfycat = 'gfycat.com/';
 var soundcloud = 'soundcloud.com/';
@@ -99,7 +100,11 @@ for (var c=0; c < cheesy.length; c++) {
         var mungedLink = cheesyRef.replace(".gifv", ".webm");
         var vidFrame = embedWebm(mungedLink);
         $(cheesy[c]).replaceWith(vidFrame);
-    }else if(cheesyRef.indexOf("vine.co") > -1){
+    }else if (cheesyRef.indexOf("webmup.com") > -1){
+        var mungedLink = cheesyRef + "/vid.webm";
+        var vidFrame = embedWebm(mungedLink);
+        $(cheesy[c]).append("<br />").append(vidFrame);
+    }else if(cheesyRef.indexOf("/vine.co/") > -1){
         haveVine = true;
         var vineFrame = document.createElement("iframe");
         vineFrame.class = "vine-embed";
@@ -108,7 +113,7 @@ for (var c=0; c < cheesy.length; c++) {
         vineFrame.height="400";
         vineFrame.frameborder="0";
         $(cheesy[c]).replaceWith(vineFrame);
-    }else if(cheesyRef.indexOf("twitter.com") > -1 && cheesyRef.indexOf("status") > -1){
+    }else if(cheesyRef.indexOf("twitter.com/") > -1 && cheesyRef.indexOf("status") > -1){
         haveTweet = true;
     }else if (cheesyRef.indexOf(soundcloud) > -1){
         if(soundclouds[cheesyRef]){
