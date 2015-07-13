@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.06
+// @version      1.1
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -71,58 +71,58 @@ var haveVine = false;
 var haveGfycats = false;
 var haveTweet = false;
 //cheesy embed loop go
-//I shoudl really parse urls here and get teh host butt fuck it add some slashes
-var tindeck = 'tindeck.com/listen/';
-var gfycat = 'gfycat.com/';
-var soundcloud = 'soundcloud.com/';
+var tindeck = 'tindeck.com';
+var gfycat = 'gfycat.com';
+var soundcloud = 'soundcloud.com';
 var soundclouds = {};
-var cheesy = jQuery('.postbody > a , blockquote > a');
-for (var c=0; c < cheesy.length; c++) {
-    var cheesyRef = cheesy[c].href;
-    if (cheesyRef.indexOf(tindeck) > -1){
-        console.log("got tindeck, url: " + cheesyRef);
+var links = jQuery('.postbody > a , blockquote > a');
+for (var c=0; c < links.length; c++) {
+    var anchor = links[c];
+    console.log('hostname = ' + anchor.hostname);
+    if (anchor.hostname === tindeck && anchor.href.indexOf('tindeck.com/listen/') > -1){
+        console.log("got tindeck, url: " + anchor.href);
         var tinDiv = document.createElement("div");
         var part1 = "<object width=\"466\" height=\"105\">\n<param name=\"movie\" value=\"http://tindeck.com/player/v1/player.swf?trackid=";
         var part2 = "\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><param name=\"wmode\" value=\"transparent\"></param><embed src=\"http://tindeck.com/player/v1/player.swf?trackid=";
         var part3 = "\" type=\"application/x-shockwave-flash\" wmode=\"transparent\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"466\" height=\"105\"></embed></object>";
-        var trackIdSegment = cheesyRef.substring(cheesyRef.indexOf(tindeck) + tindeck.length);
+        var trackIdSegment = anchor.href.substring(anchor.href.indexOf(tindeck) + tindeck.length);
         var trackId = trackIdSegment.substring(0, trackIdSegment.indexOf('/') > 0 ? trackIdSegment.indexOf('/') : trackIdSegment.length); //defensive lol whyyy
         tinDiv.innerHTML = part1 + trackId + part2 + trackId + part3;
-        $(cheesy[c]).replaceWith(tinDiv);
-    }else if (cheesyRef.indexOf(gfycat) > -1){
-        console.log("got gfycat url: " + cheesyRef);
-        var source = cheesyRef.substring(cheesyRef.lastIndexOf("/") + 1, (cheesyRef.substring(cheesyRef.lastIndexOf("/")).lastIndexOf(".") > -1 ? cheesyRef.lastIndexOf(".") : cheesyRef.length));
+        $(anchor).replaceWith(tinDiv);
+    }else if (anchor.hostname === gfycat){
+        console.log("got gfycat url: " + anchor.href);
+        var source = anchor.href.substring(anchor.href.lastIndexOf("/") + 1, (anchor.href.substring(anchor.href.lastIndexOf("/")).lastIndexOf(".") > -1 ? anchor.href.lastIndexOf(".") : anchor.href.length));
         console.log("sauce = " + source);
-        $(cheesy[c]).replaceWith("<img class=\"gfyitem\" data-id=\"" + source + "\" />");      
+        $(anchor).replaceWith("<img class=\"gfyitem\" data-id=\"" + source + "\" />");      
         haveGfycats = true;
-    }else if (cheesyRef.indexOf(".webm") > -1 || cheesyRef.indexOf(".gifv") > -1){
+    }else if (anchor.href.indexOf(".webm") > -1 || anchor.href.indexOf(".gifv") > -1){
         haveWebm = true;
-        var mungedLink = cheesyRef.replace(".gifv", ".webm");
+        var mungedLink = anchor.href.replace(".gifv", ".webm");
         var vidFrame = embedWebm(mungedLink);
-        $(cheesy[c]).replaceWith(vidFrame);
-    }else if (cheesyRef.indexOf("webmup.com") > -1){
-        var mungedLink = cheesyRef + "/vid.webm";
+        $(anchor).replaceWith(vidFrame);
+    }else if (anchor.hostname === "webmup.com"){
+        var mungedLink = anchor.href + "/vid.webm";
         var vidFrame = embedWebm(mungedLink);
-        $(cheesy[c]).append("<br />").append(vidFrame);
-    }else if(cheesyRef.indexOf("/vine.co/") > -1){
+        $(anchor).append("<br />").append(vidFrame);
+    }else if(anchor.hostname === "vine.co"){
         haveVine = true;
         var vineFrame = document.createElement("iframe");
         vineFrame.class = "vine-embed";
-        vineFrame.src = cheesyRef + "/embed/postcard";
+        vineFrame.src = anchor.href + "/embed/postcard";
         vineFrame.width="320";
         vineFrame.height="400";
         vineFrame.frameborder="0";
-        $(cheesy[c]).replaceWith(vineFrame);
-    }else if(cheesyRef.indexOf("twitter.com/") > -1 && cheesyRef.indexOf("status") > -1){
+        $(anchor).replaceWith(vineFrame);
+    }else if(anchor.hostname === "twitter.com" && anchor.href.indexOf("status") > -1){
         haveTweet = true;
-    }else if (cheesyRef.indexOf(soundcloud) > -1){
-        if(soundclouds[cheesyRef]){
+    }else if (anchor.hostname === soundcloud){
+        if(soundclouds[anchor.href]){
             console.log("duped");
         }
-        if(!soundclouds[cheesyRef]){
-            console.log("adding soudclown link: " + cheesyRef);
-            soundclouds[cheesyRef] = true;
-            var request = 'http://api.soundcloud.com/resolve.json?url=' + cheesyRef + '&client_id=e9e08f5d3e6c544a4d1add6c762e9e2d';
+        if(!soundclouds[anchor.href]){
+            console.log("adding soudclown link: " + anchor.href);
+            soundclouds[anchor.href] = true;
+            var request = 'http://api.soundcloud.com/resolve.json?url=' + anchor.href + '&client_id=e9e08f5d3e6c544a4d1add6c762e9e2d';
             console.log(request);
             $.get(request , function (result) {
                 //console.log(result);
