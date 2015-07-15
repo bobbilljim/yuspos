@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.1
+// @version      1.11
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -45,6 +45,18 @@ function embedWebm(url){
     return vidFrame;
 }
 
+//give me a webm url
+function embedmp4(url){
+    var vidFrame = document.createElement("video");
+    var src1 = document.createElement('source');
+    src1.setAttribute("src", url);
+    vidFrame.setAttribute("muted", '');
+    vidFrame.setAttribute("autoplay", '');
+    vidFrame.setAttribute("loop", '');
+    vidFrame.appendChild(src1);
+    return vidFrame;
+}
+
 //twitter integration
 function twitLoaded (){
     //this goes over all teh links again for a MASSIVE performance hit :(
@@ -64,6 +76,10 @@ function twitLoaded (){
 	}
 }
 
+function stringEndsWith(str, suffix){
+     return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
 //----------------- shite ----------------------------
 
 //these are probably redundant
@@ -78,7 +94,7 @@ var soundclouds = {};
 var links = jQuery('.postbody > a , blockquote > a');
 for (var c=0; c < links.length; c++) {
     var anchor = links[c];
-    console.log('hostname = ' + anchor.hostname);
+    console.log('hostname = ' + anchor.hostname + "," + anchor.href);
     if (anchor.hostname === tindeck && anchor.href.indexOf('tindeck.com/listen/') > -1){
         console.log("got tindeck, url: " + anchor.href);
         var tinDiv = document.createElement("div");
@@ -95,10 +111,12 @@ for (var c=0; c < links.length; c++) {
         console.log("sauce = " + source);
         $(anchor).replaceWith("<img class=\"gfyitem\" data-id=\"" + source + "\" />");      
         haveGfycats = true;
-    }else if (anchor.href.indexOf(".webm") > -1 || anchor.href.indexOf(".gifv") > -1){
-        haveWebm = true;
+    }else if (stringEndsWith(anchor.href, ".webm") || stringEndsWith(anchor.href, ".gifv") ){
         var mungedLink = anchor.href.replace(".gifv", ".webm");
         var vidFrame = embedWebm(mungedLink);
+        $(anchor).replaceWith(vidFrame);
+    }else if (stringEndsWith(anchor.href, ".mp4")){
+        var vidFrame = embedmp4(anchor.href);
         $(anchor).replaceWith(vidFrame);
     }else if (anchor.hostname === "webmup.com"){
         var mungedLink = anchor.href + "/vid.webm";
