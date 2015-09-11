@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.11
+// @version      1.12
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -36,7 +36,7 @@ function embedWebm(url){
     var src1 = document.createElement('source');
     src1.setAttribute("src", url);
     var src2 = document.createElement('source');
-    src2.setAttribute("src", url.replace(".webm", ".mp4"));
+    src2.setAttribute("src", url.substring(0, url.length-4) + "mp4");
     vidFrame.setAttribute("muted", '');
     vidFrame.setAttribute("autoplay", '');
     vidFrame.setAttribute("loop", '');
@@ -60,12 +60,12 @@ function embedmp4(url){
 //twitter integration
 function twitLoaded (){
     //this goes over all teh links again for a MASSIVE performance hit :(
- 	var links = jQuery('.postbody > a'); //more efficient AND wont load tweets into title text haha
+ 	var links = jQuery('.postbody > a, blockquote > a'); //more efficient AND wont load tweets into title text haha
 	//find all tweet links
 	for (var i=0; i < links.length; i++) {
         var ref = links[i].href;
-        //console.log(ref);
-        if(ref.indexOf("twitter.com") > -1 && ref.indexOf("status") > -1){
+        if(links[i].hostname === "twitter.com" && ref.indexOf("status") > -1){
+            console.log("twitter link:" + ref);
             //get tweet id
             var id = ref.substring(ref.lastIndexOf("/") + 1);
             //fuck it, just slam in the link
@@ -91,11 +91,13 @@ var tindeck = 'tindeck.com';
 var gfycat = 'gfycat.com';
 var soundcloud = 'soundcloud.com';
 var soundclouds = {};
+var bastardWebmsOrg = "webms.org/m/";
+
 var links = jQuery('.postbody > a , blockquote > a');
 for (var c=0; c < links.length; c++) {
     var anchor = links[c];
     console.log('hostname = ' + anchor.hostname + "," + anchor.href);
-    if (anchor.hostname === tindeck && anchor.href.indexOf('tindeck.com/listen/') > -1){
+    if (false && anchor.hostname === tindeck && anchor.href.indexOf('tindeck.com/listen/') > -1){
         console.log("got tindeck, url: " + anchor.href);
         var tinDiv = document.createElement("div");
         var part1 = "<object width=\"466\" height=\"105\">\n<param name=\"movie\" value=\"http://tindeck.com/player/v1/player.swf?trackid=";
@@ -111,8 +113,13 @@ for (var c=0; c < links.length; c++) {
         console.log("sauce = " + source);
         $(anchor).replaceWith("<img class=\"gfyitem\" data-id=\"" + source + "\" />");      
         haveGfycats = true;
+    }else if (anchor.href.indexOf(bastardWebmsOrg) && stringEndsWith(anchor.href, ".webm")){
+        //Fuck this arsehole site
+        var mungedLink = anchor.href.replace(bastardWebmsOrg, bastardWebmsOrg.substring(0,10));
+        var vidFrame = embedWebm(mungedLink);
+        $(anchor).replaceWith(vidFrame);
     }else if (stringEndsWith(anchor.href, ".webm") || stringEndsWith(anchor.href, ".gifv") ){
-        var mungedLink = anchor.href.replace(".gifv", ".webm");
+        var mungedLink = anchor.href.substring(0, anchor.href.length-4) + "webm";
         var vidFrame = embedWebm(mungedLink);
         $(anchor).replaceWith(vidFrame);
     }else if (stringEndsWith(anchor.href, ".mp4")){
@@ -132,6 +139,7 @@ for (var c=0; c < links.length; c++) {
         vineFrame.frameborder="0";
         $(anchor).replaceWith(vineFrame);
     }else if(anchor.hostname === "twitter.com" && anchor.href.indexOf("status") > -1){
+        console.log("tweet");
         haveTweet = true;
     }else if (anchor.hostname === soundcloud){
         if(soundclouds[anchor.href]){
