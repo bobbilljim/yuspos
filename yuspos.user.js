@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.06
+// @version      1.12
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -36,7 +36,7 @@ function embedWebm(url){
     var src1 = document.createElement('source');
     src1.setAttribute("src", url);
     var src2 = document.createElement('source');
-    src2.setAttribute("src", url.replace(".webm", ".mp4"));
+    src2.setAttribute("src", url.substring(0, url.length-4) + "mp4");
     vidFrame.setAttribute("muted", '');
     vidFrame.setAttribute("autoplay", '');
     vidFrame.setAttribute("loop", '');
@@ -45,15 +45,27 @@ function embedWebm(url){
     return vidFrame;
 }
 
+//give me a webm url
+function embedmp4(url){
+    var vidFrame = document.createElement("video");
+    var src1 = document.createElement('source');
+    src1.setAttribute("src", url);
+    vidFrame.setAttribute("muted", '');
+    vidFrame.setAttribute("autoplay", '');
+    vidFrame.setAttribute("loop", '');
+    vidFrame.appendChild(src1);
+    return vidFrame;
+}
+
 //twitter integration
 function twitLoaded (){
     //this goes over all teh links again for a MASSIVE performance hit :(
- 	var links = jQuery('.postbody > a'); //more efficient AND wont load tweets into title text haha
+ 	var links = jQuery('.postbody > a, blockquote > a'); //more efficient AND wont load tweets into title text haha
 	//find all tweet links
 	for (var i=0; i < links.length; i++) {
         var ref = links[i].href;
-        //console.log(ref);
-        if(ref.indexOf("twitter.com") > -1 && ref.indexOf("status") > -1){
+        if(links[i].hostname === "twitter.com" && ref.indexOf("status") > -1){
+            console.log("twitter link:" + ref);
             //get tweet id
             var id = ref.substring(ref.lastIndexOf("/") + 1);
             //fuck it, just slam in the link
@@ -64,6 +76,10 @@ function twitLoaded (){
 	}
 }
 
+function stringEndsWith(str, suffix){
+     return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
 //----------------- shite ----------------------------
 
 //these are probably redundant
@@ -71,47 +87,59 @@ var haveVine = false;
 var haveGfycats = false;
 var haveTweet = false;
 //cheesy embed loop go
-//I shoudl really parse urls here and get teh host butt fuck it add some slashes
-var tindeck = 'tindeck.com/listen/';
-var gfycat = 'gfycat.com/';
-var cheesy = jQuery('.postbody > a , blockquote > a');
-for (var c=0; c < cheesy.length; c++) {
-    var cheesyRef = cheesy[c].href;
-    if (cheesyRef.indexOf(tindeck) > -1){
-        console.log("got tindeck, url: " + cheesyRef);
+var tindeck = 'tindeck.com';
+var gfycat = 'gfycat.com';
+var soundcloud = 'soundcloud.com';
+var soundclouds = {};
+var bastardWebmsOrg = "webms.org/m/";
+
+var links = jQuery('.postbody > a , blockquote > a');
+for (var c=0; c < links.length; c++) {
+    var anchor = links[c];
+    console.log('hostname = ' + anchor.hostname + "," + anchor.href);
+    if (false && anchor.hostname === tindeck && anchor.href.indexOf('tindeck.com/listen/') > -1){
+        console.log("got tindeck, url: " + anchor.href);
         var tinDiv = document.createElement("div");
         var part1 = "<object width=\"466\" height=\"105\">\n<param name=\"movie\" value=\"http://tindeck.com/player/v1/player.swf?trackid=";
         var part2 = "\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><param name=\"wmode\" value=\"transparent\"></param><embed src=\"http://tindeck.com/player/v1/player.swf?trackid=";
         var part3 = "\" type=\"application/x-shockwave-flash\" wmode=\"transparent\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"466\" height=\"105\"></embed></object>";
-        var trackIdSegment = cheesyRef.substring(cheesyRef.indexOf(tindeck) + tindeck.length);
+        var trackIdSegment = anchor.href.substring(anchor.href.indexOf(tindeck) + tindeck.length);
         var trackId = trackIdSegment.substring(0, trackIdSegment.indexOf('/') > 0 ? trackIdSegment.indexOf('/') : trackIdSegment.length); //defensive lol whyyy
         tinDiv.innerHTML = part1 + trackId + part2 + trackId + part3;
-        $(cheesy[c]).replaceWith(tinDiv);
-    }else if (cheesyRef.indexOf(gfycat) > -1){
-        console.log("got gfycat url: " + cheesyRef);
-        var source = cheesyRef.substring(cheesyRef.lastIndexOf("/") + 1, (cheesyRef.substring(cheesyRef.lastIndexOf("/")).lastIndexOf(".") > -1 ? cheesyRef.lastIndexOf(".") : cheesyRef.length));
+        $(anchor).replaceWith(tinDiv);
+    }else if (anchor.hostname === gfycat){
+        console.log("got gfycat url: " + anchor.href);
+        var source = anchor.href.substring(anchor.href.lastIndexOf("/") + 1, (anchor.href.substring(anchor.href.lastIndexOf("/")).lastIndexOf(".") > -1 ? anchor.href.lastIndexOf(".") : anchor.href.length));
         console.log("sauce = " + source);
-        $(cheesy[c]).replaceWith("<img class=\"gfyitem\" data-id=\"" + source + "\" />");      
+        $(anchor).replaceWith("<img class=\"gfyitem\" data-id=\"" + source + "\" />");      
         haveGfycats = true;
-    }else if (cheesyRef.indexOf(".webm") > -1 || cheesyRef.indexOf(".gifv") > -1){
-        haveWebm = true;
-        var mungedLink = cheesyRef.replace(".gifv", ".webm");
+    }else if (anchor.href.indexOf(bastardWebmsOrg) && stringEndsWith(anchor.href, ".webm")){
+        //Fuck this arsehole site
+        var mungedLink = anchor.href.replace(bastardWebmsOrg, bastardWebmsOrg.substring(0,10));
         var vidFrame = embedWebm(mungedLink);
-        $(cheesy[c]).replaceWith(vidFrame);
-    }else if (cheesyRef.indexOf("webmup.com") > -1){
-        var mungedLink = cheesyRef + "/vid.webm";
+        $(anchor).replaceWith(vidFrame);
+    }else if (stringEndsWith(anchor.href, ".webm") || stringEndsWith(anchor.href, ".gifv") ){
+        var mungedLink = anchor.href.substring(0, anchor.href.length-4) + "webm";
         var vidFrame = embedWebm(mungedLink);
-        $(cheesy[c]).append("<br />").append(vidFrame);
-    }else if(cheesyRef.indexOf("/vine.co/") > -1){
+        $(anchor).replaceWith(vidFrame);
+    }else if (stringEndsWith(anchor.href, ".mp4")){
+        var vidFrame = embedmp4(anchor.href);
+        $(anchor).replaceWith(vidFrame);
+    }else if (anchor.hostname === "webmup.com"){
+        var mungedLink = anchor.href + "/vid.webm";
+        var vidFrame = embedWebm(mungedLink);
+        $(anchor).append("<br />").append(vidFrame);
+    }else if(anchor.hostname === "vine.co"){
         haveVine = true;
         var vineFrame = document.createElement("iframe");
         vineFrame.class = "vine-embed";
-        vineFrame.src = cheesyRef + "/embed/postcard";
+        vineFrame.src = anchor.href + "/embed/postcard";
         vineFrame.width="320";
         vineFrame.height="400";
         vineFrame.frameborder="0";
-        $(cheesy[c]).replaceWith(vineFrame);
-    }else if(cheesyRef.indexOf("twitter.com/") > -1 && cheesyRef.indexOf("status") > -1){
+        $(anchor).replaceWith(vineFrame);
+    }else if(anchor.hostname === "twitter.com" && anchor.href.indexOf("status") > -1){
+        console.log("tweet");
         haveTweet = true;
     }
 }
