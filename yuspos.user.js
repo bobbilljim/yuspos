@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.12
+// @version      1.2
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -80,6 +80,7 @@ function stringEndsWith(str, suffix){
      return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+function shite(){
 //----------------- shite ----------------------------
 
 //these are probably redundant
@@ -93,7 +94,13 @@ var soundcloud = 'soundcloud.com';
 var soundclouds = {};
 var bastardWebmsOrg = "webms.org/m/";
 
-var links = jQuery('.postbody > a , blockquote > a');
+    var unsafe = /nms|nws|nsfw/i;
+
+    var links = jQuery('.postbody').filter(function(index, elem){
+        var isNsfw = unsafe.test(elem.innerHTML);
+        return !isNsfw;
+    }).find('a');
+
 for (var c=0; c < links.length; c++) {
     var anchor = links[c];
     console.log('hostname = ' + anchor.hostname + "," + anchor.href);
@@ -152,6 +159,8 @@ if (haveVine){
 if(haveTweet){
     loadScript("http://platform.twitter.com/widgets.js", twitLoaded, "twitscript");
 }
+}
+shite();
 
 //some functionality
 //jQuery('.userinfo.userid-43235').parent().attr('style', "background-color: purple !important;background-image:none !important;");
