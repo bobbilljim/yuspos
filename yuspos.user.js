@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.5
+// @version      1.6
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -97,10 +97,7 @@ function gifvConversion(){
             if(!bits){
                 continue;
             }
-            //this tries to stop the image loading.
-            image.setAttribute('src','');
-            image.setAttribute('origSrc',src);
-            
+                      
             if(seen.indexOf(src) >=0){
                 continue;
             }
@@ -116,8 +113,11 @@ function gifvConversion(){
                 },
                 success: function(result) {
                     if(result.data.webm){
-                        sourceUrl = this.origSrc;
-                        jQuery('img[origSrc="' + this.origSrc + '"]').each(function(i, element){
+                        jQuery('img[src="' + this.origSrc + '"]').each(function(i, element){
+                            //try to stop image loading (unforts if we do it earlier we dont know which ones are gif)
+                            element.setAttribute('src','');
+                            element.setAttribute('origSrc',this.origSrc);//just in case vOv
+                            
                             var mySpan = document.createElement('span');
                             mySpan.classList.add("yusposImgurEmbed");
                             var vidFrame = embedWebm(result.data.webm);
