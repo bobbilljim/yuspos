@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.3
+// @version      1.5
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -79,6 +79,63 @@ function twitLoaded (){
 function stringEndsWith(str, suffix){
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
+
+function gifvConversion(){
+    var images = document.querySelectorAll('td.postbody img');
+    var seen = [];
+    
+    for (var index in images) {
+        var image = images[index];
+
+        if (typeof image !== 'object') continue;
+
+        var src = image.getAttribute('src');
+            
+        if (/i\.imgur\.com/.test(src)) {
+            var bits = /\/(.{5}|.{7})[sbtmlh]?\.(jpg|png|gif)/i.exec(src);
+            
+            if(!bits){
+                continue;
+            }
+            //this tries to stop the image loading.
+            image.setAttribute('src','');
+            image.setAttribute('origSrc',src);
+            
+            if(seen.indexOf(src) >=0){
+                continue;
+            }
+            seen.push(src);
+                                   
+            jQuery.ajax({
+                url: 'https://api.imgur.com/3/image/' + bits[1],
+                method: 'GET',
+                origSrc: src,
+                headers: {
+                    Authorization:"Client-ID b2243b6af4c6ef4",
+                    Accept: 'application/json'
+                },
+                success: function(result) {
+                    if(result.data.webm){
+                        sourceUrl = this.origSrc;
+                        jQuery('img[origSrc="' + this.origSrc + '"]').each(function(i, element){
+                            var mySpan = document.createElement('span');
+                            mySpan.classList.add("yusposImgurEmbed");
+                            var vidFrame = embedWebm(result.data.webm);
+                            mySpan.appendChild(vidFrame);
+                            if(element.parentNode.classList.contains("timg_container")){
+                                console.log("de-timging!");
+                                element.parentNode.parentNode.replaceChild(mySpan, element.parentNode);
+                            }else{
+                                element.parentNode.replaceChild(mySpan, element);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
+}
+gifvConversion(); //run this ASAP my g
 
 function shite(){
     //----------------- shite ----------------------------
