@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.6
+// @version      1.7
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -112,7 +112,7 @@ function gifvConversion(){
                     Accept: 'application/json'
                 },
                 success: function(result) {
-                    if(result.data.webm){
+                    if(result.data.webm  && result.data.size > 500000){
                         jQuery('img[src="' + this.origSrc + '"]').each(function(i, element){
                             //try to stop image loading (unforts if we do it earlier we dont know which ones are gif)
                             element.setAttribute('src','');
