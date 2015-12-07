@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.7
+// @version      1.8
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -81,6 +81,12 @@ function stringEndsWith(str, suffix){
 }
 
 function gifvConversion(){
+	//add spoiler
+	var myStyle = document.createElement('style');
+	myStyle.setAttribute('type', 'text/css');
+	myStyle.innerHTML = ".bbc-spoiler.reveal video, .bbc-spoiler.stay video {visibility: visible;}.bbc-spoiler video {visibility: hidden;}";
+	document.head.appendChild(myStyle);
+	
     var images = document.querySelectorAll('td.postbody img');
     var seen = [];
     
