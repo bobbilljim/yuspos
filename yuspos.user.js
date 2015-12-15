@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SA forums shit
 // @namespace    bobbilljim.com
-// @version      1.8
+// @version      1.9
 // @description  sa forums shit
 // @author       You
 // @match        http://forums.somethingawful.com/*
@@ -60,8 +60,13 @@ function embedmp4(url){
 //twitter integration
 function twitLoaded (){
 	//this goes over all teh links again for a MASSIVE performance hit :(
-	var links = jQuery('.postbody > a, blockquote > a'); //more efficient AND wont load tweets into title text haha
 	//find all tweet links
+	var unsafe = /nms|nws|nsfw/i;
+	var links = jQuery('.postbody').filter(function(index, elem){
+		var isNsfw = unsafe.test(elem.innerHTML);
+		return !isNsfw;
+	}).find('a');
+	
 	for (var i=0; i < links.length; i++) {
 		var ref = links[i].href;
 		if(links[i].hostname === "twitter.com" && ref.indexOf("status") > -1){
